@@ -1,5 +1,8 @@
 package battleship;
 
+import battleship.ui.BoardSnapshot;
+import battleship.ui.BoardWindow;
+
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,12 +35,21 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String JANELA = "janela";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
 	 */
 	public static void menu() {
+		try {
+			runMenu();
+		} finally {
+			BoardWindow.shutdown();
+		}
+	}
 
+	/** Reads and executes console commands until the player quits. */
+	private static void runMenu() {
 		IFleet myFleet = null;
 		IGame game = null;
 		menuHelp();
@@ -52,11 +64,26 @@ public class Tasks {
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
+					updateBoardWindow(game);
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
+					updateBoardWindow(game);
+					break;
+				case JANELA:
+					if (game == null) {
+						System.out.println("Crie primeiro uma frota com gerafrota ou lefrota.");
+					} else {
+						BoardSnapshot snapshot = BoardSnapshot.from(game);
+						try {
+							BoardWindow.show(snapshot);
+						} catch (IllegalStateException e) {
+							System.out.println("Não foi possível abrir a janela: " + e.getMessage());
+							LOGGER.error("Falha ao abrir a janela do tabuleiro", e);
+						}
+					}
 					break;
 				case STATUS:
 					if (myFleet != null)
@@ -71,9 +98,11 @@ public class Tasks {
 						game.readEnemyFire(in);
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
+						updateBoardWindow(game);
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							BoardWindow.shutdown();
 							System.exit(0);
 						}
 					}
@@ -84,6 +113,7 @@ public class Tasks {
 							game.randomEnemyFire();
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+							updateBoardWindow(game);
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
@@ -93,6 +123,7 @@ public class Tasks {
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+							BoardWindow.shutdown();
 							System.exit(0);
 						}
 					}
@@ -114,6 +145,17 @@ public class Tasks {
 	}
 
 	/**
+	 * Copies the board on the command thread and updates the window if it is open.
+	 *
+	 * @param game current game to display
+	 */
+	private static void updateBoardWindow(IGame game) {
+		if (BoardWindow.isOpen()) {
+			BoardWindow.update(BoardSnapshot.from(game));
+		}
+	}
+
+	/**
 	 * This function provides help information about the menu commands.
 	 */
 	public static void menuHelp() {
@@ -123,6 +165,7 @@ public class Tasks {
 		System.out.println("- " + LEFROTA + ": Permite criar e carregar uma frota personalizada.");
 		System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
 		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
+		System.out.println("- " + JANELA + ": Abre a janela gráfica do tabuleiro.");
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
