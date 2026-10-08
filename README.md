@@ -8,6 +8,12 @@
 
 ---
 
+| Curso | Número | Nome |
+| :--- | :--- | :--- |
+| LETI | 113146 | Ricardo Oliveira |
+| LETI | 129360 | Francisco Farinha |
+| LETI | 129763 | Rebeca Noronha |
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
