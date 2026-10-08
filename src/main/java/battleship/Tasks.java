@@ -53,6 +53,7 @@ public class Tasks {
 	private static void runMenu() {
 		IFleet myFleet = null;
 		IGame game = null;
+		GameClock clock = new GameClock(); // STOPWATCH
 		Leaderboard leaderboard = new Leaderboard();
 		String playerName = "";
 		int totalShots = 0;
@@ -69,6 +70,7 @@ public class Tasks {
 					totalShots = 0;
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
+					clock.startGame(); // STOPWATCH
 					game.printMyBoard(false, true);
 					updateBoardWindow(game);
 					break;
@@ -76,6 +78,7 @@ public class Tasks {
 					totalShots = 0;
 					myFleet = buildFleet(in);
 					game = new Game(myFleet);
+					clock.startGame(); // STOPWATCH
 					game.printMyBoard(false, true);
 					updateBoardWindow(game);
 					break;
@@ -103,14 +106,18 @@ public class Tasks {
 					break;
 				case RAJADA:
 					if (game != null) {
+						long ms = clock.endMove(); // STOPWATCH
 						game.readEnemyFire(in);
 						totalShots += Game.NUMBER_SHOTS;
 
+						System.out.println("Tempo da jogada: " + GameClock.format(ms)); // STOPWATCH
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
 						updateBoardWindow(game);
 
 						if (game.getRemainingShips() == 0) {
+							clock.endGame(); // STOPWATCH
+							System.out.println(clock.summary()); // STOPWATCH
 							game.over();
 							BoardWindow.shutdown();
 
@@ -132,6 +139,7 @@ public class Tasks {
 
 							System.exit(0);
 						}
+						clock.startMove(); // STOPWATCH: começa a contar a rajada seguinte
 					}
 					break;
 				case SIMULA:
