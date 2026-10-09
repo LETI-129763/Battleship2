@@ -1,6 +1,7 @@
 package battleship;
 
 import java.util.Scanner;
+import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +41,10 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		Leaderboard leaderboard = new Leaderboard();
+		String playerName = "";
+		int totalShots = 0;
+
 		menuHelp();
 
 		System.out.print("> ");
@@ -49,11 +54,13 @@ public class Tasks {
 
 			switch (command) {
 				case GERAFROTA:
+					totalShots = 0;
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
 					break;
 				case LEFROTA:
+					totalShots = 0;
 					myFleet = buildFleet(in);
 					game = new Game(myFleet);
 					game.printMyBoard(false, true);
@@ -69,11 +76,30 @@ public class Tasks {
 				case RAJADA:
 					if (game != null) {
 						game.readEnemyFire(in);
+						totalShots += Game.NUMBER_SHOTS;
+
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
+
+							System.out.println("Total shots: " + totalShots);
+							playerName = readPlayerName(in);
+
+							try {
+								leaderboard.saveResult(playerName, totalShots);
+								System.out.println("Result saved successfully.");
+							} catch (IOException e) {
+								System.out.println("Could not save result: " + e.getMessage());
+							}
+
+							try {
+								leaderboard.printTop5();
+							} catch (IOException e) {
+								System.out.println("Could not display leaderboard: " + e.getMessage());
+							}
+
 							System.exit(0);
 						}
 					}
@@ -111,6 +137,22 @@ public class Tasks {
 			command = in.next();
 		}
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static String readPlayerName(Scanner in) {
+
+		String playerName;
+
+		do {
+			System.out.print("Enter player name: ");
+			playerName = in.nextLine().trim();
+
+			if (playerName.isEmpty()) {
+				System.out.println("Player name cannot be empty.");
+			}
+		} while (playerName.isEmpty());
+
+		return playerName;
 	}
 
 	/**
