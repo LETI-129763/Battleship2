@@ -1,0 +1,72 @@
+.board-root {
+    -fx-background-color: #eff4f8;
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+}
+
+.label {
+    -fx-text-fill: #16324f;
+}
+
+.board-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.fleet-status {
+    -fx-font-size: 16px;
+    -fx-text-fill: #536b80;
+}
+
+.board-grid {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+}
+
+.coordinate, .legend-title {
+    -fx-font-weight: bold;
+}
+
+.coordinate {
+    -fx-text-fill: #536b80;
+}
+
+.board-cell {
+    -fx-background-radius: 6px;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.legend-marker {
+    -fx-font-size: 18px;
+}
+
+.empty {
+    -fx-background-color: #dceefa;
+    -fx-text-fill: #326682;
+}
+
+.ship {
+    -fx-background-color: #36566f;
+    -fx-text-fill: white;
+}
+
+.miss {
+    -fx-background-color: #a8d5e5;
+    -fx-text-fill: #16324f;
+}
+
+.hit {
+    -fx-background-color: #f8ba55;
+    -fx-text-fill: #16324f;
+}
+
+.sunk {
+    -fx-background-color: #8d283a;
+    -fx-text-fill: white;
+}
+
+.board-hint {
+    -fx-font-size: 12px;
+    -fx-text-fill: #536b80;
+}
