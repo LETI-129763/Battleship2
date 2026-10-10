@@ -3,6 +3,8 @@
  */
 package battleship;
 
+import battleship.ui.JavaFxLauncher;
+
 public class Main
 {
 	/**
@@ -12,6 +14,9 @@ public class Main
 	 */
 	public static void main(String[] args)
     {
+		if (JavaFxLauncher.relaunchIfNeeded(args)) {
+			return;
+		}
 		System.out.println("***  Battleship  ***");
 
 		Tasks.menu();
