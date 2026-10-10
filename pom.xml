@@ -74,6 +74,8 @@
 		<allure.version>2.31.0</allure.version>
 
 		<jetbrains.annotations.version>26.1.0</jetbrains.annotations.version>
+
+		<commons.lang3.version>3.18.0</commons.lang3.version>
 		<javafx.version>21.0.12</javafx.version>
 	</properties>
 
@@ -139,6 +141,12 @@
 			<artifactId>annotations</artifactId>
 			<version>${jetbrains.annotations.version}</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons.lang3.version}</version>
 		</dependency>
 
 		<dependency>
