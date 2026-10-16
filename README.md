@@ -15,6 +15,9 @@
 | LETI | 129763 | Rebeca Noronha |
 
 
+## 📖 Assignments
+- [Prompt Final](#prompt-final)
+
 ## PROMPT FINAL
 
 Considere agora a seguinte tática avançada de geração de rajadas de tiros para jogar Batalha Naval dos Descobrimentos como um estratega de elite.
