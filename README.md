@@ -17,6 +17,9 @@
 
 ## 📖 Assignments
 - [Prompt Final](#prompt-final)
+- [Vídeo de demonstração](#video)
+- [Página do GitHub](#pagina-do-github)
+- [Resultado do último jogo com IA](#resultado-do-jogo-com-ia)
 
 ## PROMPT FINAL
 
@@ -78,7 +81,17 @@ Como o JSON de resposta agrupa os resultados dos 3 tiros sem dizer qual coordena
 ---
 Confirme que compreendeu esta estratégia, inicialize o Diário de Bordo com o Mapa 10x10 limpo e envie a **Rajada 1** em formato JSON.
 
+## Video
 
+[![Ver vídeo no YouTube](https://img.youtube.com/vi/HuSXMU3QCbg/hqdefault.jpg)](https://www.youtube.com/watch?v=HuSXMU3QCbg)
+
+## Pagina do GitHub
+
+[Visitar a página do projeto no GitHub](https://github.com/LETI-129763/Battleship2)
+
+## Resultado do jogo com IA
+
+Total shots: 39
 
 
 ## 📖 Table of Contents
