@@ -1,5 +1,5 @@
 
-# 129360 - Long Parameter List
+# 129360 - Francisco Farinha
 name: Qodana Long Parameter List 129360
 
 on:
@@ -27,7 +27,9 @@ jobs:
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2026.2
         with:
-          args: --config qodana-129360.yaml
+          args:
+            --config qodana-129360.yaml
+            --profile-path .qodana/profiles/profile-129360.yaml
           use-annotations: true
           post-pr-comment: true
           upload-result: true
