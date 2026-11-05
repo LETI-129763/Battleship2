@@ -1,4 +1,4 @@
-# 129360 - Long Parameter List
+# 129360 - Francisco Farinha
 version: "1.0"
 
 linter: jetbrains/qodana-jvm-community:2026.2
