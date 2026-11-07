@@ -455,9 +455,8 @@ public class Game implements IGame
 
 	private static int qodanaParameterListTest(
 			int a, int b, int c,
-			int d, int e, int f,
-			int g, int h, int i
+			int d, int e, int f
 	) {
-		return a + b + c + d + e + f + g + h + i;
+		return a + b + c + d + e + f;
 	}
 }
