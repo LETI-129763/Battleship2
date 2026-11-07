@@ -4,8 +4,9 @@ version: "1.0"
 linter: jetbrains/qodana-jvm-community:2026.2
 projectJDK: "24"
 
-profile:
-  path: .qodana/profiles/profile-129360.yaml
+# Merge the YAML profile into this configuration before analysis.
+imports:
+  - .qodana/profiles/profile-129360.yaml
 
 failureConditions:
   severityThresholds:
