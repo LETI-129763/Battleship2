@@ -14,7 +14,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  qodana:
+  qodana-long-parameter-list-129360:
     runs-on: ubuntu-latest
 
     steps:
