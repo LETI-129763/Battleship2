@@ -8,4 +8,4 @@ profile:
       enabled: true
       severity: WARNING
       options:
-        m_limit: 10
+        m_limit: 7
