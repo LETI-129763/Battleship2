@@ -446,6 +446,11 @@ public class Game implements IGame
 		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
 	}
 
+	// 129360 - Deliberate MethodName violation for the Checkstyle quality gate.
+	public static int CheckstyleViolationExample() {
+		return 129360;
+	}
+
 	public void over() {
 			System.out.println();
 			System.out.println("+--------------------------------------------------------------+");
