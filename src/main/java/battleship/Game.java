@@ -452,4 +452,13 @@ public class Game implements IGame
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
 			System.out.println("+--------------------------------------------------------------+");
 	}
+
+	private static int qodanaParameterListTest(
+			int a, int b, int c,
+			int d, int e, int f,
+			int g, int h, int i,
+			int j, int k, int l
+	) {
+		return a + b + c + d + e + f + g + h + i + j + k + l;
+	}
 }
