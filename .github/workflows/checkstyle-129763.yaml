@@ -1,0 +1,38 @@
+# 129763 - Rebeca Noronha
+name: Checkstyle Parameter Names 129763
+
+"on":
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  checkstyle-parameter-names-129763:
+    name: Checkstyle ParameterName 129763
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Enforce parameter naming conventions
+        uses: dbelyaev/action-checkstyle@v4.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-129763.xml
+          checkstyle_version: "12.3.0"
+          workdir: src
+          reporter: github-check
+          level: error
+          filter_mode: added
+          fail_level: error
