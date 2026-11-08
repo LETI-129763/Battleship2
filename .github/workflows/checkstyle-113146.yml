@@ -1,0 +1,36 @@
+# 113146 - Ricardo Oliveira
+name: Checkstyle Constant Names 113146
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  checkstyle-constant-names-113146:
+    name: Checkstyle ConstantName 113146
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Enforce constant naming conventions
+        uses: dbelyaev/action-checkstyle@v4.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-113146.xml
+          checkstyle_version: "12.3.0"
+          workdir: src
+          reporter: github-check
+          level: error
+          filter_mode: nofilter
+          fail_level: error
