@@ -1,0 +1,13 @@
+
+# 129360 - Long Parameter List
+version: "1.0"
+
+profile:
+  base:
+    name: empty
+  inspections:
+    - inspection: ParametersPerMethod
+      enabled: true
+      severity: WARNING
+      options:
+        m_limit: 7
