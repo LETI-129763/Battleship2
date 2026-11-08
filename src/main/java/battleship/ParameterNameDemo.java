@@ -1,8 +1,8 @@
 package battleship;
 
 public class ParameterNameDemo {
-    public static int doubleValue(int InvalidValue) {
-        return InvalidValue * 2;
+    public static int doubleValue(int validValue) {
+        return validValue * 2;
     }
 
     public static void main(String[] args) {
