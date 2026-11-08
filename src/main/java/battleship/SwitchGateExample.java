@@ -13,8 +13,6 @@ public class SwitchGateExample {
             case 7 -> "seven";
             case 8 -> "eight";
             case 9 -> "nine";
-            case 10 -> "ten";
-            case 11 -> "eleven";
             default -> "other";
         };
     }
