@@ -1,0 +1,12 @@
+# 129763 - Rebeca Noronha
+version: "1.0"
+
+profile:
+  base:
+    name: empty
+  inspections:
+    - inspection: OverlyLongMethod
+      enabled: true
+      severity: WARNING
+      options:
+        m_limit: 20
