@@ -1,0 +1,36 @@
+# 129360 - Francisco Farinha
+name: Checkstyle Method Names 129360
+
+"on":
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  checkstyle-method-names-129360:
+    name: Checkstyle MethodName 129360
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Enforce method naming conventions
+        uses: dbelyaev/action-checkstyle@v4.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          checkstyle_config: checkstyle-129360.xml
+          checkstyle_version: "12.3.0"
+          workdir: src
+          reporter: github-check
+          level: error
+          filter_mode: nofilter
+          fail_level: error
