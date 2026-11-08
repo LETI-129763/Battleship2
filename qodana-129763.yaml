@@ -1,0 +1,12 @@
+# 129763 - Rebeca Noronha
+version: "1.0"
+
+linter: jetbrains/qodana-jvm-community:2026.2
+projectJDK: "24"
+
+imports:
+  - .qodana/profiles/profile-129763.yaml
+
+failureConditions:
+  severityThresholds:
+    any: 0
