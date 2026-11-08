@@ -10,3 +10,8 @@ profile:
       severity: WARNING
       options:
         m_limit: 20
+    - inspection: OverlyComplexMethod
+      enabled: true
+      severity: WARNING
+      options:
+        m_limit: 10
