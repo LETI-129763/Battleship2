@@ -446,22 +446,10 @@ public class Game implements IGame
 		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
 	}
 
-	// 129360 - Corrected MethodName example for the Checkstyle quality gate.
-	public static int fixedCheckstyleViolationExample() {
-		return 129360;
-	}
-
 	public void over() {
 			System.out.println();
 			System.out.println("+--------------------------------------------------------------+");
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
 			System.out.println("+--------------------------------------------------------------+");
-	}
-
-	private static int qodanaParameterListTest(
-			int a, int b, int c,
-			int d, int e, int f
-	) {
-		return a + b + c + d + e + f;
 	}
 }
