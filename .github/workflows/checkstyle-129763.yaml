@@ -34,5 +34,5 @@ jobs:
           workdir: src
           reporter: github-check
           level: error
-          filter_mode: nofilter
+          filter_mode: added
           fail_level: error
