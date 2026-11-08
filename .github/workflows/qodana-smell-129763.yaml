@@ -1,3 +1,4 @@
+
 # 129763 - Rebeca Noronha
 name: Qodana Long Method 129763
 
@@ -28,6 +29,7 @@ jobs:
         with:
           args: |
             --config qodana-129763.yaml
+            --baseline .qodana/baseline-long-method-129763.sarif.json
           use-annotations: true
           post-pr-comment: true
           upload-result: true

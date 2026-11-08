@@ -1,3 +1,4 @@
+
 # 129763 - Rebeca Noronha
 version: "1.0"
 
@@ -5,12 +6,15 @@ profile:
   base:
     name: empty
   inspections:
-    - inspection: OverlyLongMethod
+    # Long Method - Number of statements
+    - inspection: NonCommentSourceStatements
       enabled: true
       severity: WARNING
       options:
         m_limit: 20
-    - inspection: OverlyComplexMethod
+
+    # Long Method - Cyclomatic Complexity
+    - inspection: CyclomaticComplexity
       enabled: true
       severity: WARNING
       options:
