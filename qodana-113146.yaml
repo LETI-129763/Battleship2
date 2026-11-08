@@ -1,0 +1,12 @@
+# 113146 - Ricardo Oliveira
+version: "1.0"
+
+linter: jetbrains/qodana-jvm-community:2026.2
+projectJDK: "24"
+
+imports:
+  - .qodana/profiles/profile-113146.yaml
+
+failureConditions:
+  severityThresholds:
+    any: 0
