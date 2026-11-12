@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BoardSnapshot</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship.ui</a>
+</div>
+
+<h1>Coverage Summary for Class: BoardSnapshot (battleship.ui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BoardSnapshot</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (28/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (32/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship.ui;
+&nbsp;
+&nbsp;import battleship.Game;
+&nbsp;import battleship.IFleet;
+&nbsp;import battleship.IGame;
+&nbsp;import battleship.IMove;
+&nbsp;import battleship.IPosition;
+&nbsp;import battleship.IShip;
+&nbsp;import battleship.Position;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * An immutable view of the player&#39;s fleet and incoming shots.
+&nbsp; * Contains no mutable game objects or graphical toolkit dependencies.
+&nbsp; */
+&nbsp;public final class BoardSnapshot {
+&nbsp;    private final List&lt;List&lt;BoardCellState&gt;&gt; cells;
+&nbsp;    private final int remainingShips;
+&nbsp;
+<b class="fc">&nbsp;    private BoardSnapshot(List&lt;List&lt;BoardCellState&gt;&gt; cells, int remainingShips) {</b>
+<b class="fc">&nbsp;        this.cells = cells.stream().map(List::copyOf).toList();</b>
+<b class="fc">&nbsp;        this.remainingShips = remainingShips;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Captures the current board on the thread that owns the game.
+&nbsp;     * Shots outside the board are ignored. Ship damage is read from both the
+&nbsp;     * move history and the ship positions, including damage applied directly.
+&nbsp;     *
+&nbsp;     * @param game the game to capture, without concurrent mutations
+&nbsp;     * @return a snapshot that can safely be sent to the graphical thread
+&nbsp;     * @throws NullPointerException if the game is null
+&nbsp;     */
+&nbsp;    public static BoardSnapshot from(IGame game) {
+<b class="fc">&nbsp;        Objects.requireNonNull(game, &quot;game&quot;);</b>
+<b class="fc">&nbsp;        IFleet fleet = game.getMyFleet();</b>
+<b class="fc">&nbsp;        boolean[][] shots = new boolean[Game.BOARD_SIZE][Game.BOARD_SIZE];</b>
+&nbsp;
+<b class="fc">&nbsp;        for (IMove move : game.getAlienMoves()) {</b>
+<b class="fc">&nbsp;            for (IPosition shot : move.getShots()) {</b>
+<b class="fc">&nbsp;                int row = shot.getRow();</b>
+<b class="fc">&nbsp;                int column = shot.getColumn();</b>
+<b class="fc">&nbsp;                if (row &gt;= 0 &amp;&amp; row &lt; Game.BOARD_SIZE &amp;&amp; column &gt;= 0 &amp;&amp; column &lt; Game.BOARD_SIZE) {</b>
+<b class="fc">&nbsp;                    shots[row][column] = true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;List&lt;BoardCellState&gt;&gt; cells = new ArrayList&lt;&gt;(Game.BOARD_SIZE);</b>
+<b class="fc">&nbsp;        for (int row = 0; row &lt; Game.BOARD_SIZE; row++) {</b>
+<b class="fc">&nbsp;            List&lt;BoardCellState&gt; cellRow = new ArrayList&lt;&gt;(Game.BOARD_SIZE);</b>
+<b class="fc">&nbsp;            for (int column = 0; column &lt; Game.BOARD_SIZE; column++) {</b>
+<b class="fc">&nbsp;                Position position = new Position(row, column);</b>
+<b class="fc">&nbsp;                IShip ship = fleet.shipAt(position);</b>
+&nbsp;                BoardCellState state;
+<b class="fc">&nbsp;                if (ship == null) {</b>
+<b class="fc">&nbsp;                    state = shots[row][column] ? BoardCellState.MISS : BoardCellState.EMPTY;</b>
+<b class="fc">&nbsp;                } else if (!ship.stillFloating()) {</b>
+<b class="fc">&nbsp;                    state = BoardCellState.SUNK;</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    boolean hit = shots[row][column] || ship.getPositions().stream()</b>
+<b class="fc">&nbsp;                            .anyMatch(part -&gt; part.equals(position) &amp;&amp; part.isHit());</b>
+<b class="fc">&nbsp;                    state = hit ? BoardCellState.HIT : BoardCellState.SHIP;</b>
+&nbsp;                }
+<b class="fc">&nbsp;                cellRow.add(state);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            cells.add(cellRow);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return new BoardSnapshot(cells, fleet.getFloatingShips().size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of board rows.
+&nbsp;     *
+&nbsp;     * @return the row count
+&nbsp;     */
+&nbsp;    public int getRows() {
+<b class="fc">&nbsp;        return cells.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of board columns.
+&nbsp;     *
+&nbsp;     * @return the column count
+&nbsp;     */
+&nbsp;    public int getColumns() {
+<b class="fc">&nbsp;        return cells.get(0).size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the visual state at zero-based board coordinates.
+&nbsp;     *
+&nbsp;     * @param row the row index
+&nbsp;     * @param column the column index
+&nbsp;     * @return the captured cell state
+&nbsp;     * @throws IndexOutOfBoundsException if either coordinate is outside the board
+&nbsp;     */
+&nbsp;    public BoardCellState getCellState(int row, int column) {
+<b class="fc">&nbsp;        return cells.get(row).get(column);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of ships that were still floating when captured.
+&nbsp;     *
+&nbsp;     * @return the remaining ship count
+&nbsp;     */
+&nbsp;    public int getRemainingShips() {
+<b class="fc">&nbsp;        return remainingShips;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-12 15:34</div>
+</div>
+</body>
+</html>
