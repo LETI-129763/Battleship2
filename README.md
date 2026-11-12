@@ -235,3 +235,23 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 **Maintained by:** [@britoeabreu](https://github.com/britoeabreu)  
 *Created for the Software Engineering students at ISCTE-IUL.*
+
+## Testes unitários automáticos — LAB 4
+
+O workflow `Unit Tests with Maven`, definido em
+`.github/workflows/unit-tests.yml`, executa os testes unitários
+automaticamente em cada push para qualquer branch e em pull requests
+para `master`.
+
+Utiliza um runner Ubuntu, Java 21 (Eclipse Temurin) e cache das
+dependências Maven. A compilação e execução dos testes são realizadas com:
+
+```bash
+mvn -B test --file pom.xml
+```
+
+Se algum teste falhar, o workflow termina com falha. Os resultados
+podem ser consultados no separador **Actions** do repositório,
+selecionando a execução e o passo **Run unit tests with Maven**.
+
+Responsável pela configuração: aluno 113146.
