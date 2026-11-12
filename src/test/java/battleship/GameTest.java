@@ -8,8 +8,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamWriteConstraints;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.Isolated;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -32,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - printValidShots: 1
  * - printFleet: 1
  */
+@Isolated("Temporarily changes Jackson's JVM-wide serialization constraints")
 public class GameTest {
 
 	private Game game;
@@ -200,6 +204,31 @@ public class GameTest {
         assertEquals(1, json.get(0).get("column").asInt());
         assertEquals("J", json.get(1).get("row").asText());
         assertEquals(10, json.get(1).get("column").asInt());
+    }
+
+    @Test
+    @DisplayName("JSON serialization errors retain their cause and have a descriptive wrapper message")
+    void wrapsJsonSerializationFailure() throws Exception {
+        StreamWriteConstraints original = StreamWriteConstraints.defaults();
+        List<IPosition> shots = List.of(new Position(0, 0));
+        try {
+            // Even the outer shot list requires one nesting level.
+            // Disallow nesting for new mappers to trigger a real Jackson failure.
+            StreamWriteConstraints.overrideDefaultStreamWriteConstraints(
+                    original.rebuild().maxNestingDepth(0).build());
+            RuntimeException failure = assertThrowsExactly(RuntimeException.class,
+                    () -> Game.jsonShots(shots));
+            assertEquals("Erro ao serializar o JSON", failure.getMessage());
+            JsonProcessingException cause = assertInstanceOf(JsonProcessingException.class, failure.getCause());
+            assertTrue(cause.getMessage().contains("nesting depth"));
+        } finally {
+            StreamWriteConstraints.overrideDefaultStreamWriteConstraints(original);
+        }
+        // The constraint change must not affect subsequent serialization.
+        assertSame(original, StreamWriteConstraints.defaults());
+        var json = new ObjectMapper().readTree(Game.jsonShots(shots));
+        assertEquals("A", json.get(0).get("row").asText());
+        assertEquals(1, json.get(0).get("column").asInt());
     }
 
     @Test
