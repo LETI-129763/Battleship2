@@ -2,6 +2,7 @@ package battleship;
 
 /**
  * Examples used to validate the Checkstyle and Qodana quality gates.
+ * Kept in the main source set so they are analyzed as application classes.
  */
 public final class QualityGateExamples129360 {
 
