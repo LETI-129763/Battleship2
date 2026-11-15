@@ -87,7 +87,7 @@ Confirme que compreendeu esta estratégia, inicialize o Diário de Bordo com o M
 
 ## Pagina do GitHub
 
-[Visitar a página do projeto no GitHub](https://github.com/LETI-129763/Battleship2)
+[Visitar a página do projeto no GitHub](https://leti-129763.github.io/Battleship2/)
 
 ## Resultado do jogo com IA
 
