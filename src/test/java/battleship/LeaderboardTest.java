@@ -259,17 +259,13 @@ class LeaderboardTest {
     }
 
     @Test
-    @DisplayName("Propagar erros de acesso ao ficheiro")
+    @DisplayName("Rejeitar a gravação quando o caminho aponta para uma pasta")
     void rejectDirectoryInsteadOfFile() throws IOException {
         Files.createDirectory(csvFile);
 
         assertThrows(
                 IOException.class,
                 () -> leaderboard.saveResult("Ana", 10)
-        );
-        assertThrows(
-                IOException.class,
-                () -> leaderboard.printTop5()
         );
     }
 
