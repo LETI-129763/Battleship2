@@ -5,7 +5,6 @@ import battleship.ui.BoardWindow;
 
 import java.util.Scanner;
 import java.io.IOException;
-import java.util.function.Function;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,38 +14,10 @@ import org.jetbrains.annotations.NotNull;
  * The type Tasks.
  */
 public class Tasks {
-	interface BoardDisplay {
-		boolean isOpen();
-		void update(BoardSnapshot snapshot);
-		void show(BoardSnapshot snapshot);
-		void shutdown();
-	}
-
 	/**
 	 * The constant LOGGER.
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
-	private static final BoardDisplay BOARD_DISPLAY = new BoardDisplay() {
-		@Override
-		public boolean isOpen() {
-			return BoardWindow.isOpen();
-		}
-
-		@Override
-		public void update(BoardSnapshot snapshot) {
-			BoardWindow.update(snapshot);
-		}
-
-		@Override
-		public void show(BoardSnapshot snapshot) {
-			BoardWindow.show(snapshot);
-		}
-
-		@Override
-		public void shutdown() {
-			BoardWindow.shutdown();
-		}
-	};
 
 	/**
 	 * The constant GOODBYE_MESSAGE.
@@ -74,34 +45,23 @@ public class Tasks {
 		try {
 			runMenu();
 		} finally {
-			BOARD_DISPLAY.shutdown();
+			BoardWindow.shutdown();
 		}
 	}
 
 	/** Reads console commands and applies them on the command thread. */
 	private static void runMenu() {
-		runMenu(new Scanner(System.in), new Leaderboard());
-	}
-
-	static void runMenu(Scanner in, Leaderboard leaderboard) {
-		runMenu(in, leaderboard, Game::new);
-	}
-
-	static void runMenu(Scanner in, Leaderboard leaderboard, Function<IFleet, IGame> gameFactory) {
-		runMenu(in, leaderboard, gameFactory, BOARD_DISPLAY);
-	}
-
-	static void runMenu(Scanner in, Leaderboard leaderboard, Function<IFleet, IGame> gameFactory,
-						BoardDisplay boardDisplay) {
 		IFleet myFleet = null;
 		IGame game = null;
 		GameClock clock = new GameClock(); // STOPWATCH
+		Leaderboard leaderboard = new Leaderboard();
 		String playerName = "";
 		int totalShots = 0;
 
 		menuHelp();
 
 		System.out.print("> ");
+		Scanner in = new Scanner(System.in);
 		String command = in.next();
 		while (!command.equals(DESISTIR)) {
 
@@ -109,25 +69,25 @@ public class Tasks {
 				case GERAFROTA:
 					totalShots = 0;
 					myFleet = Fleet.createRandom();
-					game = gameFactory.apply(myFleet);
+					game = new Game(myFleet);
 					clock.startGame(); // STOPWATCH
 					game.printMyBoard(false, true);
-					updateBoardWindow(game, boardDisplay);
+					updateBoardWindow(game);
 					break;
 				case LEFROTA:
 					totalShots = 0;
 					myFleet = buildFleet(in);
-					game = gameFactory.apply(myFleet);
+					game = new Game(myFleet);
 					clock.startGame(); // STOPWATCH
 					game.printMyBoard(false, true);
-					updateBoardWindow(game, boardDisplay);
+					updateBoardWindow(game);
 					break;
 				case JANELA:
 					if (game == null) {
 						System.out.println("Crie primeiro uma frota com gerafrota ou lefrota.");
 					} else {
 						try {
-							boardDisplay.show(BoardSnapshot.from(game));
+							BoardWindow.show(BoardSnapshot.from(game));
 						} catch (IllegalStateException e) {
 							System.out.println("Não foi possível abrir a janela: " + e.getMessage());
 							if (e.getCause() != null) {
@@ -153,13 +113,13 @@ public class Tasks {
 						System.out.println("Tempo da jogada: " + GameClock.format(ms)); // STOPWATCH
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
-						updateBoardWindow(game, boardDisplay);
+						updateBoardWindow(game);
 
 						if (game.getRemainingShips() == 0) {
 							clock.endGame(); // STOPWATCH
 							System.out.println(clock.summary()); // STOPWATCH
 							game.over();
-							boardDisplay.shutdown();
+							BoardWindow.shutdown();
 
 							System.out.println("Total shots: " + totalShots);
 							playerName = readPlayerName(in);
@@ -177,15 +137,29 @@ public class Tasks {
 								System.out.println("Could not display leaderboard: " + e.getMessage());
 							}
 
-							return;
+							System.exit(0);
 						}
 						clock.startMove(); // STOPWATCH: começa a contar a rajada seguinte
 					}
 					break;
 				case SIMULA:
 					if (game != null) {
-						if (simulateGame(game, myFleet, boardDisplay)) {
-							return;
+						while (game.getRemainingShips() > 0){
+							game.randomEnemyFire();
+							myFleet.printStatus();
+							game.printMyBoard(true, false);
+							updateBoardWindow(game);
+							try {
+								Thread.sleep(3000);
+							} catch (InterruptedException e) {
+								Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+							}
+						}
+
+						if (game.getRemainingShips() == 0) {
+							game.over();
+							BoardWindow.shutdown();
+							System.exit(0);
 						}
 					}
 					break;
@@ -203,31 +177,6 @@ public class Tasks {
 			command = in.next();
 		}
 		System.out.println(GOODBYE_MESSAGE);
-	}
-
-	static boolean simulateGame(IGame game, IFleet myFleet) {
-		return simulateGame(game, myFleet, BOARD_DISPLAY);
-	}
-
-	static boolean simulateGame(IGame game, IFleet myFleet, BoardDisplay boardDisplay) {
-		while (game.getRemainingShips() > 0) {
-			game.randomEnemyFire();
-			myFleet.printStatus();
-			game.printMyBoard(true, false);
-			updateBoardWindow(game, boardDisplay);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-
-		if (game.getRemainingShips() == 0) {
-			game.over();
-			boardDisplay.shutdown();
-			return true;
-		}
-		return false;
 	}
 
 	private static String readPlayerName(Scanner in) {
@@ -251,9 +200,9 @@ public class Tasks {
 	 *
 	 * @param game current game to display
 	 */
-	private static void updateBoardWindow(IGame game, BoardDisplay boardDisplay) {
-		if (boardDisplay.isOpen()) {
-			boardDisplay.update(BoardSnapshot.from(game));
+	private static void updateBoardWindow(IGame game) {
+		if (BoardWindow.isOpen()) {
+			BoardWindow.update(BoardSnapshot.from(game));
 		}
 	}
 
@@ -359,12 +308,12 @@ public class Tasks {
 		input = input.toUpperCase();
 
 		// Verificar os dois formatos possíveis: compactos e com espaço
-		if (part2 == null && input.matches("[A-Z]\\d+")) {
+		if (input.matches("[A-Z]\\d+")) {
 			char column = input.charAt(0); // Extrair a coluna
 			int row = Integer.parseInt(input.substring(1)); // Extrair a linha
 			return new Position(column, row);
-		} else if (part2 != null && part1.toUpperCase().matches("[A-Z]") && part2.matches("\\d+")) {
-			char column = part1.toUpperCase().charAt(0); // Extrair a coluna
+		} else if (part2 != null && part1.matches("[A-Z]") && part2.matches("\\d+")) {
+			char column = part1.charAt(0); // Extrair a coluna
 			int row = Integer.parseInt(part2); // Extrair a linha
 			return new Position(column, row);
 		} else {
