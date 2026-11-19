@@ -199,7 +199,7 @@ class FleetTest {
 
 	private boolean invokeCollisionRisk(Fleet target, IShip ship) {
 		try {
-			Method collisionRisk = Fleet.class.getDeclaredMethod("colisionRisk", IShip.class);
+			Method collisionRisk = Fleet.class.getDeclaredMethod("hasCollisionRisk", IShip.class);
 			collisionRisk.setAccessible(true);
 			return (boolean) collisionRisk.invoke(target, ship);
 		} catch (InvocationTargetException e) {

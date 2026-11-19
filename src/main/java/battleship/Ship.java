@@ -92,12 +92,12 @@ public abstract class Ship implements IShip
 	/**
 	 * The size
 	 */
-	private Integer size;
+	private int size;
 
 	/**
 	 * The Positions occupied by the ship.
 	 */
-	protected List<IPosition> positions;
+	private List<IPosition> positions;
 
 	/**
 	 * Create ships

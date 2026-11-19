@@ -9,7 +9,7 @@ public class LongMethodDemo {
         int remainingShips = 11 - sunkShips;
 
         StringBuilder report = new StringBuilder();
-        appendHeader(report, playerName, shots, hits, sunkShips, misses);
+        appendHeader(report, playerName, new ReportStats(shots, hits, sunkShips, misses));
         report.append("Accuracy: ").append(accuracy).append("%\n");
         report.append("Rating: ").append(rate(accuracy)).append("\n");
         report.append("Score: ").append(score).append("\n");
@@ -20,14 +20,13 @@ public class LongMethodDemo {
         return report.toString();
     }
 
-    private static void appendHeader(StringBuilder report, String playerName,
-                                     int shots, int hits, int sunkShips, int misses) {
+    private static void appendHeader(StringBuilder report, String playerName, ReportStats stats) {
         report.append("=== Game Report ===\n");
         report.append("Player: ").append(playerName).append("\n");
-        report.append("Total shots: ").append(shots).append("\n");
-        report.append("Hits: ").append(hits).append("\n");
-        report.append("Sunk ships: ").append(sunkShips).append("\n");
-        report.append("Misses: ").append(misses).append("\n");
+        report.append("Total shots: ").append(stats.shots()).append("\n");
+        report.append("Hits: ").append(stats.hits()).append("\n");
+        report.append("Sunk ships: ").append(stats.sunkShips()).append("\n");
+        report.append("Misses: ").append(stats.misses()).append("\n");
     }
 
     private static double computeAccuracy(int shots, int hits) {
