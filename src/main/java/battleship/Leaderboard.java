@@ -30,11 +30,15 @@ public class Leaderboard {
     }
 
     public void saveResult(String playerName, int shots) throws IOException {
-        if (playerName == null || playerName.isBlank()) {
+        saveResult(new ScoreEntry(playerName, shots));
+    }
+
+    public void saveResult(ScoreEntry entry) throws IOException {
+        if (entry.playerName() == null || entry.playerName().isBlank()) {
             throw new IllegalArgumentException("Player name cannot be empty.");
         }
 
-        if (shots <= 0) {
+        if (entry.shots() <= 0) {
             throw new IllegalArgumentException("Shots must be greater than zero.");
         }
 
@@ -46,8 +50,8 @@ public class Leaderboard {
                         StandardOpenOption.APPEND))) {
 
             String[] result = {
-                    playerName.trim(),
-                    String.valueOf(shots)
+                    entry.playerName().trim(),
+                    String.valueOf(entry.shots())
             };
 
             writer.writeNext(result);
@@ -58,11 +62,8 @@ public class Leaderboard {
         }
     }
 
-    private record Result(String playerName, int shots) {
-    }
-
-    private List<Result> loadResults() throws IOException {
-        List<Result> results = new ArrayList<>();
+    private List<ScoreEntry> loadResults() throws IOException {
+        List<ScoreEntry> results = new ArrayList<>();
 
         if (Files.notExists(filePath)) {
             return results;
@@ -91,7 +92,7 @@ public class Leaderboard {
                     throw new IOException("Invalid shot count in leaderboard.");
                 }
 
-                results.add(new Result(row[0], shots));
+                results.add(new ScoreEntry(row[0], shots));
             }
         } catch (CsvValidationException e) {
             throw new IOException("Could not read the leaderboard CSV.", e);
@@ -101,9 +102,9 @@ public class Leaderboard {
     }
 
     public void printTop5() throws IOException {
-        List<Result> results = loadResults();
+        List<ScoreEntry> results = loadResults();
 
-        results.sort(Comparator.comparingInt(Result::shots));
+        results.sort(Comparator.comparingInt(ScoreEntry::shots));
 
         System.out.println("\n=== LEADERBOARD - TOP 5 ===");
 
@@ -117,7 +118,7 @@ public class Leaderboard {
         int limit = Math.min(TOP_RESULTS_LIMIT, results.size());
 
         for (int i = 0; i < limit; i++) {
-            Result result = results.get(i);
+            ScoreEntry result = results.get(i);
 
             System.out.printf(
                     "%-6d %-25s %d%n",
