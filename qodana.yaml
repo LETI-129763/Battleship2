@@ -3,29 +3,46 @@
 #             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
 #-------------------------------------------------------------------------------#
 version: "1.0"
-
-#Specify inspection profile for code analysis
+# Broad discovery profile for Lab 4 refactoring opportunities.
+# The individual quality gates use their separate qodana-<student>.yaml files.
 profile:
-  name: qodana.starter
-
+  name: qodana.recommended
 #Enable inspections
 #include:
 #  - name: <SomeEnabledInspectionId>
-
 #Disable inspections
 #exclude:
 #  - name: <SomeDisabledInspectionId>
 #    paths:
 #      - <path/where/not/run/inspection>
-
 projectJDK: "23" #(Applied in CI/CD pipeline)
-
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
 #bootstrap: sh ./prepare-qodana.sh
-
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:
 #  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
-
 #Specify Qodana linter for analysis (Applied in CI/CD pipeline)
 linter: jetbrains/qodana-jvm-community:2025.1
+include:
+  # Keep the existing documentation check.
+  - name: DanglingJavadoc
+  # Size and complexity (use the inspections' configured/default thresholds).
+  - name: NonCommentSourceStatements
+  - name: CyclomaticComplexity
+  - name: ClassComplexity
+  - name: NestingDepth
+  - name: ParametersPerMethod
+  - name: SwitchStatementWithTooManyBranches
+  # Duplication: expressions, switch branches and string literals.
+  - name: DuplicateExpressions
+  - name: DuplicateBranchesInSwitch
+  - name: DuplicateStringLiteralInspection
+  # Redundancy, encapsulation and coupling.
+  - name: unused
+  - name: UnnecessaryLocalVariable
+  - name: SameReturnValue
+  - name: FieldMayBeFinal
+  - name: PublicField
+  - name: LawOfDemeter
+  # A static-method suggestion is a review aid, not proof of Feature Envy.
+  - name: MethodMayBeStatic
