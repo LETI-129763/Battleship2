@@ -19,30 +19,7 @@ public class Fleet implements IFleet
 	 * @return a fully constructed and valid fleet as an instance of IFleet
 	 */
 	public static IFleet createRandom() {
-
-		IFleet randomFleet = new Fleet();
-
-		// Define the types of ships to be added
-		String[] shipTypes =
-					{"galeao",                           // 1 galleon
-				 	"fragata",                           // 1 frigate
- 				 	"nau", "nau",                        // 2 carracks
-					"caravela", "caravela", "caravela",  // 3 caravels
-					"barca", "barca", "barca", "barca"}; // 4 barges
-
-		int fleetSize = 0;
-
-		while (fleetSize < shipTypes.length) {
-
-			// Build the ship
-			Ship ship = Ship.buildShip(shipTypes[fleetSize], Compass.randomBearing(), Position.randomPosition());
-
-			// Attempt to add the ship to the fleet
-			if (ship != null && randomFleet.addShip(ship)) {
-				fleetSize++; // Increment count if ship is successfully added
-			}
-		}
-		return randomFleet;
+		return RandomFleetFactory.create();
 	}
 
 
