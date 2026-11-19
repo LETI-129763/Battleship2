@@ -46,7 +46,7 @@ public class GameClock {
 
     /** Formata milissegundos como segundos, por exemplo "8,2 s". */
     public static String format(long ms) {
-        return String.format("%.1f s", ms / 1000.0);
+        return DurationFormatter.format(ms);
     }
 
     /** Resumo final: total, média, mais rápida e mais lenta. */
