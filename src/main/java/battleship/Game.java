@@ -245,14 +245,19 @@ public class Game implements IGame
 				shots.add(newShot);
 		}
 
-		System.out.print("rajada ");
-		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+		printRandomVolley(shots);
 
 		this.fireShots(shots);
 
 		return Game.jsonShots(shots);
+	}
+
+	/** Prints a generated volley in the console command format. */
+	private static void printRandomVolley(List<IPosition> shots) {
+		System.out.print("rajada ");
+		for (IPosition shot : shots)
+			System.out.print(shot + " ");
+		System.out.println();
 	}
 
 	/** Builds candidate shots excluding previous shots and cells adjacent to sunk ships. */
