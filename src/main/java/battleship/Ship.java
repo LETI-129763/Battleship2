@@ -97,7 +97,7 @@ public abstract class Ship implements IShip
 	/**
 	 * The Positions occupied by the ship.
 	 */
-	protected List<IPosition> positions;
+	private List<IPosition> positions;
 
 	/**
 	 * Create ships
