@@ -17,6 +17,8 @@ import java.util.List;
 
 public class Leaderboard {
 
+    private static final int TOP_RESULTS_LIMIT = 5;
+
     private final Path filePath = Path.of("leaderboard.csv");
 
     public void saveResult(String playerName, int shots) throws IOException {
@@ -103,7 +105,7 @@ public class Leaderboard {
 
         System.out.printf("%-6s %-25s %s%n", "Rank", "Player", "Shots");
 
-        int limit = Math.min(5, results.size());
+        int limit = Math.min(TOP_RESULTS_LIMIT, results.size());
 
         for (int i = 0; i < limit; i++) {
             Result result = results.get(i);
