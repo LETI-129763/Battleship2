@@ -137,6 +137,7 @@ public class Game implements IGame
 	private static final char SHOT_SHIP_MARKER = '*';
 	private static final char SHOT_WATER_MARKER = 'o';
 	private static final char SHIP_ADJACENT_MARKER = '-';
+	private static final String SINGLE_LETTER_COORDINATE_REGEX = "[A-Za-z]";
 
 	//------------------------------------------------------------------
 	private final IFleet myFleet;
@@ -282,7 +283,7 @@ public class Game implements IGame
 			// Lê a próxima parte e constrói uma posição
 			String token = inputScanner.next();
 
-			if (token.matches("[A-Za-z]")) {
+			if (token.matches(SINGLE_LETTER_COORDINATE_REGEX)) {
 				// Caso seja somente uma coluna ("A", "B", etc.), esperar o próximo número
 				if (inputScanner.hasNextInt()) {
 					int row = inputScanner.nextInt();
