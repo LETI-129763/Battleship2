@@ -69,18 +69,12 @@ public class Tasks {
 				case GERAFROTA:
 					totalShots = 0;
 					myFleet = Fleet.createRandom();
-					game = new Game(myFleet);
-					clock.startGame(); // STOPWATCH
-					game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
-					updateBoardWindow(game);
+					game = startNewGame(myFleet, clock);
 					break;
 				case LEFROTA:
 					totalShots = 0;
 					myFleet = buildFleet(in);
-					game = new Game(myFleet);
-					clock.startGame(); // STOPWATCH
-					game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
-					updateBoardWindow(game);
+					game = startNewGame(myFleet, clock);
 					break;
 				case JANELA:
 					if (game == null) {
@@ -177,6 +171,14 @@ public class Tasks {
 			command = in.next();
 		}
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static IGame startNewGame(IFleet fleet, GameClock clock) {
+		IGame game = new Game(fleet);
+		clock.startGame(); // STOPWATCH
+		game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
+		updateBoardWindow(game);
+		return game;
 	}
 
 	private static String readPlayerName(Scanner in) {
