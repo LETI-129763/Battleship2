@@ -1,6 +1,7 @@
 package battleship;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class Game implements IGame
 {
@@ -145,6 +146,7 @@ public class Game implements IGame
 
 	private final IFleet alienFleet;
 	private final List<IMove> myMoves;
+	private final Supplier<Random> randomSupplier;
 
 	private int countInvalidShots;
 	private int countRepeatedShots;
@@ -155,6 +157,18 @@ public class Game implements IGame
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
+		this(myFleet, () -> new Random(System.currentTimeMillis()));
+	}
+
+	/**
+	 * Creates a game with a controllable source of random generators.
+	 *
+	 * @param myFleet the player's fleet
+	 * @param randomSupplier supplies a random generator for each call to randomEnemyFire
+	 */
+	public Game(IFleet myFleet, Supplier<Random> randomSupplier)
+	{
+		this.randomSupplier = Objects.requireNonNull(randomSupplier, "randomSupplier");
 		this.moveNumber = 1;
 
 		this.alienMoves = new ArrayList<IMove>();
@@ -204,8 +218,7 @@ public class Game implements IGame
 	 */
 	public String randomEnemyFire() {
 
-		// Criar uma instância de Random com uma seed baseada no timestamp atual
-		Random random = new Random(System.currentTimeMillis());
+		Random random = randomSupplier.get();
 
 		List<IPosition> candidateShots = buildCandidateShots();
 

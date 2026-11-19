@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -283,8 +286,30 @@ public class GameTest {
         }
     }
 
-    // The generator owns its Random instance. Repetitions exercise duplicate draws
-    // without asserting a particular sequence or changing the production API.
+    @Test
+    @DisplayName("Supplied seeded generators reproduce volleys and are requested once per volley")
+    void randomFireUsesSuppliedGeneratorForEachVolley() {
+        AtomicInteger supplierCalls = new AtomicInteger();
+        Supplier<Random> randomSupplier = () -> {
+            supplierCalls.incrementAndGet();
+            return new Random(129360L);
+        };
+        Game first = new Game(new Fleet(), randomSupplier);
+        Game second = new Game(new Fleet(), randomSupplier);
+        assertEquals(0, supplierCalls.get(), "Generators should be requested when firing, not at construction");
+
+        for (int volley = 0; volley < 2; volley++) {
+            String firstJson = first.randomEnemyFire();
+            String secondJson = second.randomEnemyFire();
+            assertEquals(firstJson, secondJson);
+            assertEquals(first.getAlienMoves().get(volley).getShots(),
+                    second.getAlienMoves().get(volley).getShots());
+            assertEquals(2 * (volley + 1), supplierCalls.get());
+        }
+    }
+
+    // The default constructor supplies a timestamp-seeded Random for each volley.
+    // Repetitions exercise duplicate draws without asserting a particular sequence.
     @RepeatedTest(32)
     @DisplayName("With exactly three candidates a random volley fires each remaining position once")
     void randomFireWithExactlyThreeCandidates() {
