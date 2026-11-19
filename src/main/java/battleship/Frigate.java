@@ -8,7 +8,7 @@ package battleship;
  * Date: 2023-10-10
  * Time: 15:30
  */
-public class Frigate extends Ship {
+public class Frigate extends LinearShip {
 
 	/**
 	 * Instantiates a new Frigate.
