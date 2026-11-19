@@ -71,7 +71,7 @@ public class Tasks {
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
 					clock.startGame(); // STOPWATCH
-					game.printMyBoard(false, true);
+					game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
 					updateBoardWindow(game);
 					break;
 				case LEFROTA:
@@ -79,7 +79,7 @@ public class Tasks {
 					myFleet = buildFleet(in);
 					game = new Game(myFleet);
 					clock.startGame(); // STOPWATCH
-					game.printMyBoard(false, true);
+					game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
 					updateBoardWindow(game);
 					break;
 				case JANELA:
@@ -102,7 +102,7 @@ public class Tasks {
 					break;
 				case MAPA:
 					if (myFleet != null)
-						game.printMyBoard(false, true);
+						game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
 					break;
 				case RAJADA:
 					if (game != null) {
@@ -112,7 +112,7 @@ public class Tasks {
 
 						System.out.println("Tempo da jogada: " + GameClock.format(ms)); // STOPWATCH
 						myFleet.printStatus();
-						game.printMyBoard(true, false);
+						game.printMyBoard(BoardDisplayOptions.SHOTS_WITHOUT_LEGEND);
 						updateBoardWindow(game);
 
 						if (game.getRemainingShips() == 0) {
@@ -147,7 +147,7 @@ public class Tasks {
 						while (game.getRemainingShips() > 0){
 							game.randomEnemyFire();
 							myFleet.printStatus();
-							game.printMyBoard(true, false);
+							game.printMyBoard(BoardDisplayOptions.SHOTS_WITHOUT_LEGEND);
 							updateBoardWindow(game);
 							try {
 								Thread.sleep(3000);
@@ -165,7 +165,7 @@ public class Tasks {
 					break;
 				case TIROS:
 					if (game != null)
-						game.printMyBoard(true, true);
+						game.printMyBoard(BoardDisplayOptions.SHOTS_WITH_LEGEND);
 					break;
                 case AJUDA:
                     menuHelp();

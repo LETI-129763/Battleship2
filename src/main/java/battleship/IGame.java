@@ -115,9 +115,27 @@ public interface IGame
 	void printMyBoard(boolean show_shots, boolean show_legend);
 
 	/**
+	 * Prints my fleet and alien shots using the supplied display options.
+	 *
+	 * @param options whether to display shots and the legend
+	 */
+	default void printMyBoard(BoardDisplayOptions options) {
+		printMyBoard(options.showShots(), options.showLegend());
+	}
+
+	/**
 	 * Print the alien board (alien fleet + my shots).
 	 */
 	void printAlienBoard(boolean show_shots, boolean show_legend);
+
+	/**
+	 * Prints the alien fleet and my shots using the supplied display options.
+	 *
+	 * @param options whether to display shots and the legend
+	 */
+	default void printAlienBoard(BoardDisplayOptions options) {
+		printAlienBoard(options.showShots(), options.showLegend());
+	}
 
 	void over();
 }

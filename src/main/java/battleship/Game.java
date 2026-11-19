@@ -1,10 +1,7 @@
 package battleship;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import java.util.*;
+import java.util.function.Supplier;
 
 public class Game implements IGame
 {
@@ -17,15 +14,26 @@ public class Game implements IGame
 	 *                    and their positions are shown according to their placement.
 	 * @param moves       the list of moves containing shots. If shot positions are shown,
 	 *                    they will be rendered based on their outcome (hit, miss, etc.).
-	 * @param show_shots  if true, displays the shots taken during the game and marks
+	 * @param showShots   if true, displays the shots taken during the game and marks
 	 *                    their result (hit or miss) on the board.
 	 * @param showLegend  if true, displays an explanatory legend of the symbols used
 	 *                    to represent various elements such as ships, misses, hits, etc.
 	 */
-	public static void printBoard(IFleet fleet, List<IMove> moves, boolean show_shots, boolean showLegend) {
+	public static void printBoard(IFleet fleet, List<IMove> moves, boolean showShots, boolean showLegend) {
+		printBoard(fleet, moves, new BoardDisplayOptions(showShots, showLegend));
+	}
 
+	/**
+	 * Prints a fleet and its incoming shots using the supplied display options.
+	 *
+	 * @param fleet the fleet to display
+	 * @param moves the incoming moves
+	 * @param options whether to display shots and the legend
+	 */
+	public static void printBoard(IFleet fleet, List<IMove> moves, BoardDisplayOptions options) {
 		assert fleet != null;
 		assert moves != null;
+		assert options != null;
 
 		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
 
@@ -35,12 +43,12 @@ public class Game implements IGame
 
 		printShips(fleet, map);
 
-		if (show_shots)
+		if (options.showShots())
 			printBoardShots(moves, map);
 
 		printBoardFrame(map);
 
-		if (showLegend) {
+		if (options.showLegend()) {
 			System.out.println("          LEGENDA");
 			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
 			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
@@ -103,8 +111,7 @@ public class Game implements IGame
 
 	/**
 	 * Serializes a list of shot positions into a JSON string. Each shot is represented
-	 * with its classic row and column values. The method uses the Jackson library for
-	 * JSON serialization.
+	 * with its classic row and column values.
 	 *
 	 * @param shots a list of shot positions to be serialized. Each position is represented
 	 *              by an implementation of the {@code IPosition} interface. The list must
@@ -114,35 +121,11 @@ public class Game implements IGame
 	 * @throws RuntimeException if an error occurs during JSON serialization.
 	 */
 	public static String jsonShots(List<IPosition> shots) {
-
-		assert shots != null;
-
-		// Serializar os tiros gerados em JSON usando a biblioteca Jackson
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-		// 1. Create a simplified list containing only the desired data
-		List<Map<String, Object>> simplifiedShots = new ArrayList<>();
-		for (IPosition shot : shots) {
-			Map<String, Object> simplePos = new LinkedHashMap<>();
-			// We use getClassicRow() and getClassicColumn() based on your current JSON output
-			simplePos.put("row", String.valueOf(shot.getClassicRow()));
-			simplePos.put("column", shot.getClassicColumn());
-			simplifiedShots.add(simplePos);
-		}
-
-		String jsonString = null;
-		try {
-			// 2. Serialize the simplified list instead of the raw 'shots' list
-			jsonString = objectMapper.writeValueAsString(simplifiedShots);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException("Erro ao serializar o JSON", e);
-		}
+		String jsonString = ShotJsonSerializer.serialize(shots);
 
 		System.out.println(jsonString);
 		System.out.println();
 
-		// Retornar o JSON
 		return jsonString;
 	}
 
@@ -155,6 +138,7 @@ public class Game implements IGame
 	private static final char SHOT_SHIP_MARKER = '*';
 	private static final char SHOT_WATER_MARKER = 'o';
 	private static final char SHIP_ADJACENT_MARKER = '-';
+	private static final String SINGLE_LETTER_COORDINATE_REGEX = "[A-Za-z]";
 
 	//------------------------------------------------------------------
 	private final IFleet myFleet;
@@ -162,16 +146,29 @@ public class Game implements IGame
 
 	private final IFleet alienFleet;
 	private final List<IMove> myMoves;
+	private final Supplier<Random> randomSupplier;
 
-	private Integer countInvalidShots;
-	private Integer countRepeatedShots;
-	private Integer countHits;
-	private Integer countSinks;
+	private int countInvalidShots;
+	private int countRepeatedShots;
+	private int countHits;
+	private int countSinks;
 	private int moveNumber;
 
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
+		this(myFleet, () -> new Random(System.currentTimeMillis()));
+	}
+
+	/**
+	 * Creates a game with a controllable source of random generators.
+	 *
+	 * @param myFleet the player's fleet
+	 * @param randomSupplier supplies a random generator for each call to randomEnemyFire
+	 */
+	public Game(IFleet myFleet, Supplier<Random> randomSupplier)
+	{
+		this.randomSupplier = Objects.requireNonNull(randomSupplier, "randomSupplier");
 		this.moveNumber = 1;
 
 		this.alienMoves = new ArrayList<IMove>();
@@ -221,18 +218,9 @@ public class Game implements IGame
 	 */
 	public String randomEnemyFire() {
 
-		// Criar uma instância de Random com uma seed baseada no timestamp atual
-		Random random = new Random(System.currentTimeMillis());
+		Random random = randomSupplier.get();
 
-		Set<IPosition> usablePositions = new HashSet<IPosition>();
-		for (int r = 0; r < BOARD_SIZE; r++)
-			for (int c = 0; c < BOARD_SIZE; c++)
-				usablePositions.add(new Position(r, c));
-
-		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
-
-		List<IPosition> candidateShots = new ArrayList<>(usablePositions);
+		List<IPosition> candidateShots = buildCandidateShots();
 
 		// Criar lista para armazenar os tiros
 		List<IPosition> shots = new ArrayList<IPosition>();
@@ -257,14 +245,32 @@ public class Game implements IGame
 				shots.add(newShot);
 		}
 
-		System.out.print("rajada ");
-		for (IPosition shot : shots)
-			System.out.print(shot + " ");
-		System.out.println();
+		printRandomVolley(shots);
 
 		this.fireShots(shots);
 
 		return Game.jsonShots(shots);
+	}
+
+	/** Prints a generated volley in the console command format. */
+	private static void printRandomVolley(List<IPosition> shots) {
+		System.out.print("rajada ");
+		for (IPosition shot : shots)
+			System.out.print(shot + " ");
+		System.out.println();
+	}
+
+	/** Builds candidate shots excluding previous shots and cells adjacent to sunk ships. */
+	private List<IPosition> buildCandidateShots() {
+		Set<IPosition> usablePositions = new HashSet<IPosition>();
+		for (int r = 0; r < BOARD_SIZE; r++)
+			for (int c = 0; c < BOARD_SIZE; c++)
+				usablePositions.add(new Position(r, c));
+
+		this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
+		this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
+
+		return new ArrayList<>(usablePositions);
 	}
 
 
@@ -295,7 +301,7 @@ public class Game implements IGame
 			// Lê a próxima parte e constrói uma posição
 			String token = inputScanner.next();
 
-			if (token.matches("[A-Za-z]")) {
+			if (token.matches(SINGLE_LETTER_COORDINATE_REGEX)) {
 				// Caso seja somente uma coluna ("A", "B", etc.), esperar o próximo número
 				if (inputScanner.hasNextInt()) {
 					int row = inputScanner.nextInt();
@@ -422,8 +428,7 @@ public class Game implements IGame
 	@Override
 	public int getRemainingShips()
 	{
-		List<IShip> floatingShips = myFleet.getFloatingShips();
-		return floatingShips.size();
+		return myFleet.getFloatingShips().size();
 	}
 
 	public boolean repeatedShot(IPosition pos)
@@ -436,14 +441,28 @@ public class Game implements IGame
 		return false;
 	}
 
+	@Override
 	public void printMyBoard(boolean show_shots, boolean show_legend)
 	{
-		Game.printBoard(this.myFleet, this.alienMoves, show_shots, show_legend);
+		printMyBoard(new BoardDisplayOptions(show_shots, show_legend));
 	}
 
+	@Override
+	public void printMyBoard(BoardDisplayOptions options)
+	{
+		Game.printBoard(this.myFleet, this.alienMoves, options);
+	}
+
+	@Override
 	public void printAlienBoard(boolean show_shots, boolean show_legend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
+		printAlienBoard(new BoardDisplayOptions(show_shots, show_legend));
+	}
+
+	@Override
+	public void printAlienBoard(BoardDisplayOptions options)
+	{
+		Game.printBoard(this.alienFleet, this.myMoves, options);
 	}
 
 	public void over() {
