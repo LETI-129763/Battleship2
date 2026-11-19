@@ -66,7 +66,8 @@ public class Leaderboard {
             String[] row;
 
             while ((row = reader.readNext()) != null) {
-                if (row.length != 2 || row[0].isBlank()) {
+                boolean invalidEntry = row.length != 2 || row[0].isBlank();
+                if (invalidEntry) {
                     throw new IOException("Invalid leaderboard entry.");
                 }
 
