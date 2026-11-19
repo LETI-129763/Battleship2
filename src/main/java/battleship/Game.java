@@ -19,9 +19,20 @@ public class Game implements IGame
 	 *                    to represent various elements such as ships, misses, hits, etc.
 	 */
 	public static void printBoard(IFleet fleet, List<IMove> moves, boolean showShots, boolean showLegend) {
+		printBoard(fleet, moves, new BoardDisplayOptions(showShots, showLegend));
+	}
 
+	/**
+	 * Prints a fleet and its incoming shots using the supplied display options.
+	 *
+	 * @param fleet the fleet to display
+	 * @param moves the incoming moves
+	 * @param options whether to display shots and the legend
+	 */
+	public static void printBoard(IFleet fleet, List<IMove> moves, BoardDisplayOptions options) {
 		assert fleet != null;
 		assert moves != null;
+		assert options != null;
 
 		char[][] map = new char[BOARD_SIZE][BOARD_SIZE];
 
@@ -31,12 +42,12 @@ public class Game implements IGame
 
 		printShips(fleet, map);
 
-		if (showShots)
+		if (options.showShots())
 			printBoardShots(moves, map);
 
 		printBoardFrame(map);
 
-		if (showLegend) {
+		if (options.showLegend()) {
 			System.out.println("          LEGENDA");
 			System.out.println("'" + SHIP_MARKER + "'->navio, '" + SHIP_ADJACENT_MARKER + "'->adjacente a navio, '" + EMPTY_MARKER + "'->água");
 			System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
@@ -412,14 +423,28 @@ public class Game implements IGame
 		return false;
 	}
 
+	@Override
 	public void printMyBoard(boolean show_shots, boolean show_legend)
 	{
-		Game.printBoard(this.myFleet, this.alienMoves, show_shots, show_legend);
+		printMyBoard(new BoardDisplayOptions(show_shots, show_legend));
 	}
 
+	@Override
+	public void printMyBoard(BoardDisplayOptions options)
+	{
+		Game.printBoard(this.myFleet, this.alienMoves, options);
+	}
+
+	@Override
 	public void printAlienBoard(boolean show_shots, boolean show_legend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
+		printAlienBoard(new BoardDisplayOptions(show_shots, show_legend));
+	}
+
+	@Override
+	public void printAlienBoard(BoardDisplayOptions options)
+	{
+		Game.printBoard(this.alienFleet, this.myMoves, options);
 	}
 
 	public void over() {

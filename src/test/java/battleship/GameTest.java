@@ -361,6 +361,37 @@ public class GameTest {
     }
 
     @Test
+    @DisplayName("Display options preserve board output for every combination of shots and legend")
+    void displayOptionsPreserveBoardOutput() {
+        assertTrue(game.getMyFleet().addShip(new Barge(Compass.NORTH, new Position(1, 1))));
+        assertTrue(game.getAlienFleet().addShip(new Barge(Compass.NORTH, new Position(8, 8))));
+        game.getAlienMoves().add(new Move(1, List.of(new Position(1, 1)), List.of()));
+        game.getMyMoves().add(new Move(1, List.of(new Position(8, 8)), List.of()));
+        IGame view = game;
+
+        for (boolean showShots : new boolean[]{false, true}) {
+            for (boolean showLegend : new boolean[]{false, true}) {
+                BoardDisplayOptions options = new BoardDisplayOptions(showShots, showLegend);
+                String mine = captureOutput(() -> view.printMyBoard(options));
+                String alien = captureOutput(() -> view.printAlienBoard(options));
+
+                assertEquals(showShots ? '*' : '#', boardCell(mine, 1, 1));
+                assertEquals('.', boardCell(mine, 8, 8));
+                assertEquals(showShots ? '*' : '#', boardCell(alien, 8, 8));
+                assertEquals('.', boardCell(alien, 1, 1));
+                assertEquals(showLegend, mine.contains("LEGENDA"));
+                assertEquals(showLegend, alien.contains("LEGENDA"));
+                assertEquals(mine, captureOutput(() -> view.printMyBoard(showShots, showLegend)));
+                assertEquals(alien, captureOutput(() -> view.printAlienBoard(showShots, showLegend)));
+                assertEquals(mine, captureOutput(() -> Game.printBoard(
+                        game.getMyFleet(), game.getAlienMoves(), options)));
+                assertEquals(mine, captureOutput(() -> Game.printBoard(
+                        game.getMyFleet(), game.getAlienMoves(), showShots, showLegend)));
+            }
+        }
+    }
+
+    @Test
     @DisplayName("Ending the game prints the farewell without changing its state")
     void printsGameOver() {
         String output = captureOutput(game::over);
