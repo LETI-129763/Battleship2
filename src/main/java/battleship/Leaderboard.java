@@ -19,7 +19,15 @@ public class Leaderboard {
 
     private static final int TOP_RESULTS_LIMIT = 5;
 
-    private final Path filePath = Path.of("leaderboard.csv");
+    private final Path filePath;
+
+    public Leaderboard() {
+        this(Path.of("leaderboard.csv"));
+    }
+
+    public Leaderboard(Path filePath) {
+        this.filePath = filePath;
+    }
 
     public void saveResult(String playerName, int shots) throws IOException {
         if (playerName == null || playerName.isBlank()) {
