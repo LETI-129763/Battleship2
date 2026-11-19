@@ -54,7 +54,7 @@ public class Tasks {
 		IFleet myFleet = null;
 		IGame game = null;
 		GameClock clock = new GameClock(); // STOPWATCH
-		Leaderboard leaderboard = new Leaderboard();
+		LeaderboardService leaderboard = new Leaderboard();
 		String playerName = "";
 		int totalShots = 0;
 

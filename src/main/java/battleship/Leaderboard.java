@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Leaderboard {
+public class Leaderboard implements LeaderboardService {
 
     private static final int TOP_RESULTS_LIMIT = 5;
 
@@ -29,6 +29,7 @@ public class Leaderboard {
         this.filePath = filePath;
     }
 
+    @Override
     public void saveResult(String playerName, int shots) throws IOException {
         saveResult(new ScoreEntry(playerName, shots));
     }
@@ -101,6 +102,7 @@ public class Leaderboard {
         return results;
     }
 
+    @Override
     public void printTop5() throws IOException {
         List<ScoreEntry> results = loadResults();
 
