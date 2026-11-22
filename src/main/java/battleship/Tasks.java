@@ -54,7 +54,7 @@ public class Tasks {
 		IFleet myFleet = null;
 		IGame game = null;
 		GameClock clock = new GameClock(); // STOPWATCH
-		Leaderboard leaderboard = new Leaderboard();
+		LeaderboardService leaderboard = new Leaderboard();
 		String playerName = "";
 		int totalShots = 0;
 
@@ -69,18 +69,12 @@ public class Tasks {
 				case GERAFROTA:
 					totalShots = 0;
 					myFleet = Fleet.createRandom();
-					game = new Game(myFleet);
-					clock.startGame(); // STOPWATCH
-					game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
-					updateBoardWindow(game);
+					game = startNewGame(myFleet, clock);
 					break;
 				case LEFROTA:
 					totalShots = 0;
 					myFleet = buildFleet(in);
-					game = new Game(myFleet);
-					clock.startGame(); // STOPWATCH
-					game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
-					updateBoardWindow(game);
+					game = startNewGame(myFleet, clock);
 					break;
 				case JANELA:
 					if (game == null) {
@@ -179,6 +173,14 @@ public class Tasks {
 		System.out.println(GOODBYE_MESSAGE);
 	}
 
+	private static IGame startNewGame(IFleet fleet, GameClock clock) {
+		IGame game = new Game(fleet);
+		clock.startGame(); // STOPWATCH
+		game.printMyBoard(BoardDisplayOptions.FLEET_WITH_LEGEND);
+		updateBoardWindow(game);
+		return game;
+	}
+
 	private static String readPlayerName(Scanner in) {
 
 		String playerName;
@@ -234,20 +236,20 @@ public class Tasks {
 		assert in != null;
 
 		Fleet fleet = new Fleet();
-		int i = 0; // i represents the total of successfully created ships
-		while (i < Fleet.FLEET_SIZE) {
-			IShip s = readShip(in);
-			if (s != null) {
-				boolean success = fleet.addShip(s);
+		int shipsAdded = 0;
+		while (shipsAdded < Fleet.FLEET_SIZE) {
+			IShip ship = readShip(in);
+			if (ship != null) {
+				boolean success = fleet.addShip(ship);
 				if (success)
-					i++;
+					shipsAdded++;
 				else
-					LOGGER.info("Falha na criacao de {} {} {}", s.getCategory(), s.getBearing(), s.getPosition());
+					LOGGER.info("Falha na criacao de {} {} {}", ship.getCategory(), ship.getBearing(), ship.getPosition());
 			} else {
 				LOGGER.info("Navio desconhecido!");
 			}
 		}
-		LOGGER.info("{} navios adicionados com sucesso!", i);
+		LOGGER.info("{} navios adicionados com sucesso!", shipsAdded);
 		return fleet;
 	}
 
@@ -263,8 +265,7 @@ public class Tasks {
 
 		String shipKind = in.next();
 		Position pos = readPosition(in);
-		char c = in.next().charAt(0);
-		Compass bearing = Compass.charToCompass(c);
+		Compass bearing = Compass.charToCompass(in.next().charAt(0));
 		return Ship.buildShip(shipKind, bearing, pos);
 	}
 
